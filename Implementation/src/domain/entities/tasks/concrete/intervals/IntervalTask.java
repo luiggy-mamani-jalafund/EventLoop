@@ -5,7 +5,6 @@ import domain.entities.tasks.interfaces.IIntervalTask;
 import java.util.UUID;
 
 public class IntervalTask implements IIntervalTask {
-
     private final UUID intervalId;
     private final Runnable runnable;
     private final long periodMilliseconds;

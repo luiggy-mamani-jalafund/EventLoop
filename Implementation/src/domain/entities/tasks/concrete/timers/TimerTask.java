@@ -3,7 +3,6 @@ package domain.entities.tasks.concrete.timers;
 import domain.entities.tasks.interfaces.ITimerTask;
 
 public class TimerTask implements ITimerTask {
-
     private final Runnable executable;
     private final long scheduledTime;
 

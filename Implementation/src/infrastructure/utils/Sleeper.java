@@ -1,7 +1,6 @@
 package infrastructure.utils;
 
 public class Sleeper {
-
     public static void tryToSleepOrDie(long timeMilliseconds) {
         try {
             Thread.sleep(timeMilliseconds);

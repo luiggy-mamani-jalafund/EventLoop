@@ -1,12 +1,11 @@
 package infrastructure.useCases;
 
-import application.useCases.queues.ICallstackHandler;
 import application.useCases.IEventLoopHandler;
+import application.useCases.queues.ICallstackHandler;
 import domain.entities.tasks.interfaces.ITask;
 import infrastructure.utils.Sleeper;
 
 public class EventLoopHandler implements IEventLoopHandler {
-
     private final long SLEEP_LOOP_MILLISECONDS = 1;
     private final ICallstackHandler callstackHandler;
 
@@ -18,7 +17,6 @@ public class EventLoopHandler implements IEventLoopHandler {
     public void run() {
         while (callstackHandler.hasTasks()) {
             callstackHandler.runTasks();
-
             Sleeper.tryToSleepOrDie(SLEEP_LOOP_MILLISECONDS);
         }
     }
