@@ -1,10 +1,10 @@
 package infrastructure.useCases;
 
 import application.useCases.IEventLoopHandler;
+import application.useCases.queues.ICallstackHandler;
 import application.useCases.queues.IMicrotaskHandler;
 import domain.entities.tasks.concrete.promises.Promise;
 import domain.entities.tasks.interfaces.IPromiseTask;
-import application.useCases.queues.ICallstackHandler;
 import domain.entities.tasks.interfaces.ITask;
 import infrastructure.utils.Sleeper;
 
@@ -16,6 +16,7 @@ public class EventLoopHandler implements IEventLoopHandler {
 
     public EventLoopHandler(ICallstackHandler callstackHandler, IMicrotaskHandler microtaskHandler) {
         this.callstackHandler = callstackHandler;
+        this.microtaskHandler = microtaskHandler;
         this.isRunning = true;
     }
 
@@ -24,27 +25,20 @@ public class EventLoopHandler implements IEventLoopHandler {
         while (isRunning) {
             if (callstackHandler.hasTasks()) {
                 callstackHandler.runTasks();
-            } else {
-                Sleeper.tryToSleepOrDie(SLEEP_LOOP_MILLISECONDS);
             }
-
-            if (Thread.interrupted()) {
-                throw new InterruptedException("Event loop was interrupted");
-            }
-        this.microtaskHandler = microtaskHandler;
-    }
-
-    @Override
-    public void run() {
-        while (true) {
-            callstackHandler.runTasks();
 
             while (microtaskHandler.hasTasks()) {
                 Runnable microtask = microtaskHandler.getMicrotask();
                 microtask.run();
             }
 
-            Sleeper.tryToSleepOrDie(SLEEP_LOOP_MILLISECONDS);
+            if (!callstackHandler.hasTasks() && !microtaskHandler.hasTasks()) {
+                Sleeper.tryToSleepOrDie(SLEEP_LOOP_MILLISECONDS);
+            }
+
+            if (Thread.interrupted()) {
+                throw new InterruptedException("Event loop was interrupted");
+            }
         }
     }
 
@@ -67,17 +61,32 @@ public class EventLoopHandler implements IEventLoopHandler {
     @Override
     public boolean isRunning() {
         return isRunning;
+    }
+
+    @Override
     public <T> Promise<T> executePromise(IPromiseTask<T> task) {
+        if (!isRunning) {
+            throw new IllegalStateException("Event loop is shutdown");
+        }
+        if (task == null) {
+            throw new IllegalArgumentException("Promise task cannot be null");
+        }
         return microtaskHandler.createPromise(task.getExecutor());
     }
 
     @Override
     public <T> Promise<T> resolvePromise(T value) {
+        if (!isRunning) {
+            throw new IllegalStateException("Event loop is shutdown");
+        }
         return microtaskHandler.resolvePromise(value);
     }
 
     @Override
     public <T> Promise<T> rejectPromise(Throwable error) {
+        if (!isRunning) {
+            throw new IllegalStateException("Event loop is shutdown");
+        }
         return microtaskHandler.rejectPromise(error);
     }
 }

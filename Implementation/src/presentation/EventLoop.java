@@ -15,7 +15,8 @@ public class EventLoop implements AutoCloseable {
 
     public EventLoop() {
         ICallstackHandler callstackHandler = new CallStackHandler();
-        this.eventLoopHandler = new EventLoopHandler(callstackHandler);
+        IMicrotaskHandler microtaskHandler = new MicrotaskHandler();
+        this.eventLoopHandler = new EventLoopHandler(callstackHandler, microtaskHandler);
         this.eventLoopThread = new Thread(this::runEventLoop, "EventLoop-Thread");
     }
 
@@ -24,16 +25,12 @@ public class EventLoop implements AutoCloseable {
             throw new IllegalStateException("Cannot start a shutdown event loop");
         }
         eventLoopThread.start();
-        IMicrotaskHandler microtaskHandler = new MicrotaskHandler();
-
-        eventLoopHandler = new EventLoopHandler(callstackHandler, microtaskHandler);
     }
 
     public void execute(ITask<Runnable> task) {
         eventLoopHandler.executeTask(task);
     }
 
-    private void runEventLoop() {
     public <T> Promise<T> execute(IPromiseTask<T> task) {
         return eventLoopHandler.executePromise(task);
     }
@@ -46,7 +43,7 @@ public class EventLoop implements AutoCloseable {
         return eventLoopHandler.rejectPromise(error);
     }
 
-    public void run() {
+    public void runEventLoop() {
         try {
             eventLoopHandler.run();
         } catch (InterruptedException e) {
