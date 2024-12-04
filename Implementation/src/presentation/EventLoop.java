@@ -10,7 +10,6 @@ import infrastructure.useCases.queues.CallStackHandler;
 import infrastructure.useCases.queues.MicrotaskHandler;
 
 public class EventLoop {
-
     private final EventLoopHandler eventLoopHandler;
 
     public EventLoop() {
@@ -37,7 +36,10 @@ public class EventLoop {
     }
 
     public void run() {
-        eventLoopHandler.run();
+        try {
+            eventLoopHandler.run();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
-
 }

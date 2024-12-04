@@ -1,33 +1,30 @@
 package infrastructure.useCases.queues;
 
 import application.useCases.queues.ICallstackHandler;
-
-import java.util.ArrayDeque;
-import java.util.Optional;
+import domain.entities.tasks.concrete.immediates.ImmediateTask;
 
 public class CallStackHandler implements ICallstackHandler {
-
-    private final ArrayDeque<Runnable> tasks;
+    private final TaskQueue taskQueue;
 
     public CallStackHandler() {
-        this.tasks = new ArrayDeque<>();
+        this.taskQueue = new TaskQueue();
     }
 
     @Override
     public void runTasks() {
         while (hasTasks()) {
-            Optional<Runnable> task = Optional.ofNullable(tasks.poll());
-            task.ifPresent(Runnable::run);
+            taskQueue.dequeueTask()
+                    .ifPresent(task -> task.getExecutor().run());
         }
     }
 
     @Override
     public void addTask(Runnable task) {
-        tasks.add(task);
+        taskQueue.addTask(new ImmediateTask(task));
     }
 
     @Override
     public boolean hasTasks() {
-        return !tasks.isEmpty();
+        return taskQueue.hasTasks();
     }
 }
