@@ -1,5 +1,7 @@
 package application.useCases;
 
+import domain.entities.tasks.concrete.promises.Promise;
+import domain.entities.tasks.interfaces.IPromiseTask;
 import domain.entities.tasks.interfaces.ITask;
 
 public interface IEventLoopHandler {
@@ -25,4 +27,7 @@ public interface IEventLoopHandler {
      * @return true if the event loop is running
      */
     boolean isRunning();
+    <T> Promise<T> executePromise(IPromiseTask<T> task);
+    <T> Promise<T> resolvePromise(T value);
+    <T> Promise<T> rejectPromise(Throwable error);
 }
