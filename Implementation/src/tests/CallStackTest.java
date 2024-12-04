@@ -5,24 +5,32 @@ import presentation.EventLoop;
 
 public class CallStackTest {
     public static void main(String[] args) {
-        EventLoop eventLoop = new EventLoop();
+        try (EventLoop eventLoop = new EventLoop()) {
+            eventLoop.start();
 
-        eventLoop.execute(new ImmediateTask(() -> System.out.println("task 1")));
-        Runnable func = () -> System.out.println("task 3");
-        Runnable func2 = () -> {
-            eventLoop.execute(new ImmediateTask(func));
-            eventLoop.execute(new ImmediateTask(() -> System.out.println("task 2")));
-        };
-        eventLoop.execute(new ImmediateTask(() -> System.out.println("task 4")));
-        eventLoop.execute(new ImmediateTask(func2));
+            eventLoop.execute(new ImmediateTask(() -> System.out.println("task 1")));
 
-        eventLoop.run();
+            Runnable func = () -> System.out.println("task 3");
+            Runnable func2 = () -> {
+                eventLoop.execute(new ImmediateTask(func));
+                eventLoop.execute(new ImmediateTask(() -> System.out.println("task 2")));
+            };
+
+            eventLoop.execute(new ImmediateTask(() -> System.out.println("task 4")));
+            eventLoop.execute(new ImmediateTask(func2));
+
+            Thread.sleep(100);
+
+            eventLoop.shutdown();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
 
         /* Expected
          * Task 1
          * Task 4
          * Task 3
          * Task 2
-        * */
+         */
     }
 }
