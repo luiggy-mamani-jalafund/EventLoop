@@ -12,6 +12,7 @@ public class EventQueueTest {
         eventLoop.execute(new ImmediateTask(() -> System.out.println("Task 3")));
 
         eventLoop.execute(new ImmediateTask(() -> {
+            eventLoop.execute(new ImmediateTask(() -> System.out.println("Task 6 (nested)")));
             System.out.println("Task 4 (complex task)");
             eventLoop.execute(new ImmediateTask(() -> System.out.println("Task 5 (nested)")));
         }));
@@ -19,11 +20,12 @@ public class EventQueueTest {
         eventLoop.run();
 
         /* Expected Output:
-         * Task 1
-         * Task 2
-         * Task 3
-         * Task 4 (complex task)
-         * Task 5 (nested)
+            Task 1
+            Task 2
+            Task 3
+            Task 4 (complex task)
+            Task 6 (nested)
+            Task 5 (nested)
          */
     }
 }
