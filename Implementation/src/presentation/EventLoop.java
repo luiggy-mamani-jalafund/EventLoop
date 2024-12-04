@@ -6,13 +6,11 @@ import infrastructure.useCases.EventLoopHandler;
 import infrastructure.useCases.queues.CallStackHandler;
 
 public class EventLoop {
-
     private final EventLoopHandler eventLoopHandler;
 
     public EventLoop() {
         ICallstackHandler callstackHandler = new CallStackHandler();
-
-        eventLoopHandler = new EventLoopHandler(callstackHandler);
+        this.eventLoopHandler = new EventLoopHandler(callstackHandler);
     }
 
     public void execute(ITask<Runnable> task) {
@@ -20,7 +18,10 @@ public class EventLoop {
     }
 
     public void run() {
-        eventLoopHandler.run();
+        try {
+            eventLoopHandler.run();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
-
 }
