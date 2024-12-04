@@ -4,7 +4,6 @@ import domain.entities.tasks.concrete.immediates.ImmediateTask;
 import presentation.EventLoop;
 
 public class CallStackTest {
-
     public static void main(String[] args) {
         EventLoop eventLoop = new EventLoop();
 
