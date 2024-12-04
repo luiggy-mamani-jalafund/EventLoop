@@ -9,27 +9,31 @@ import java.net.http.HttpResponse;
 public class NestedFetchApiTest {
 
     public static void main(String[] args) {
-        EventLoop eventLoop = new EventLoop();
-        FetchApi fetchApi = new FetchApi(eventLoop);
+        try (EventLoop eventLoop = new EventLoop()) {
+            FetchApi fetchApi = new FetchApi(eventLoop);
+            eventLoop.start();
 
-        eventLoop.execute(new ImmediateTask(() -> System.out.println("task 1")));
+            eventLoop.execute(new ImmediateTask(() -> System.out.println("task 1")));
 
-        fetchApi.fetch("https://jsonplaceholder.typicode.com/posts/1")
-                .then(HttpResponse::body)
-                .thenAccept(response -> {
-                    System.out.println(response);
-                    fetchApi.fetch("https://jsonplaceholder.typicode.com/posts/2")
-                            .then(HttpResponse::body)
-                            .thenAccept(System.out::println)
-                            .catchError(error -> System.out.println(error.getMessage()));
-                })
-                .catchError(error -> {
-                    System.out.println(error.getMessage());
-                });
+            fetchApi.fetch("https://jsonplaceholder.typicode.com/posts/1")
+                    .then(HttpResponse::body)
+                    .thenAccept(response -> {
+                        System.out.println(response);
+                        fetchApi.fetch("https://jsonplaceholder.typicode.com/posts/2")
+                                .then(HttpResponse::body)
+                                .thenAccept(System.out::println)
+                                .catchError(error -> System.out.println(error.getMessage()));
+                    })
+                    .catchError(error -> {
+                        System.out.println(error.getMessage());
+                    });
 
-        eventLoop.execute(new ImmediateTask(() -> System.out.println("task 2")));
-        eventLoop.run();
+            eventLoop.execute(new ImmediateTask(() -> System.out.println("task 2")));
 
+            Thread.sleep(4000);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
         /*
         * Expected:
         * task 1
