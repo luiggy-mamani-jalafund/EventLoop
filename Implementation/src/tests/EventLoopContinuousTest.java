@@ -34,7 +34,6 @@ public class EventLoopContinuousTest {
             Thread.sleep(3000);
             System.out.println("Adding final task after 3 more seconds...");
 
-            // Tarea final
             eventLoop.execute(new ImmediateTask(() ->
                     System.out.println("Final Task: " + System.currentTimeMillis())
             ));
