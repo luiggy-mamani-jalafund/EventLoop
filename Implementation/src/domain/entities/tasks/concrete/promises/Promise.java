@@ -2,6 +2,7 @@ package domain.entities.tasks.concrete.promises;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 public class Promise<T> {
 
@@ -11,16 +12,28 @@ public class Promise<T> {
         this.future = future;
     }
 
-    public Promise<T> then(Consumer<T> thenAction) {
-        future.thenAccept(thenAction);
-
-        return this;
+    public <U> Promise<U> then(Function<T, U> onFulfilled) {
+        return new Promise<>(future.thenApplyAsync(onFulfilled));
     }
 
-    public void catchException(Consumer<Throwable> catchAction) {
-        future.exceptionally((ex) -> {
-            catchAction.accept(ex);
+    public Promise<T> catchError(Consumer<Throwable> onRejected) {
+        CompletableFuture<T> catchFuture = future.exceptionally((exception) -> {
+            onRejected.accept(exception);
             return null;
         });
+
+        return new Promise<>(catchFuture);
+    }
+
+    public void finallyDo(Runnable onFinally) {
+        future.whenComplete((result, error) ->
+                onFinally.run());
+    }
+
+    public Promise<T> thenAccept(Consumer<? super T> action) {
+        return new Promise<>(future.thenApply(value -> {
+            action.accept(value);
+            return value;
+        }));
     }
 }
