@@ -28,6 +28,14 @@ public class EventLoop {
         return eventLoopHandler.executePromise(task);
     }
 
+    public <T> Promise<T> resolve(T value) {
+        return eventLoopHandler.resolvePromise(value);
+    }
+
+    public <T> Promise<T> reject(Throwable error) {
+        return eventLoopHandler.rejectPromise(error);
+    }
+
     public void run() {
         eventLoopHandler.run();
     }

@@ -37,6 +37,22 @@ public class MicrotaskHandler implements IMicrotaskHandler {
     }
 
     @Override
+    public <T> Promise<T> resolvePromise(T value) {
+        CompletableFuture<T> future = new CompletableFuture<>();
+        addTask(() -> future.complete(value));
+
+        return new Promise<>(future);
+    }
+
+    @Override
+    public <T> Promise<T> rejectPromise(Throwable error) {
+        CompletableFuture<T> future = new CompletableFuture<>();
+        addTask(() -> future.completeExceptionally(error));
+
+        return new Promise<>(future);
+    }
+
+    @Override
     public Runnable getMicrotask() {
         return microtaskQueue.poll();
     }

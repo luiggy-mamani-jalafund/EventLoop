@@ -10,7 +10,7 @@ import infrastructure.utils.Sleeper;
 
 public class EventLoopHandler implements IEventLoopHandler {
 
-    private final long SLEEP_LOOP_MILLISECONDS = 200;
+    private final long SLEEP_LOOP_MILLISECONDS = 1;
     private final ICallstackHandler callstackHandler;
     private final IMicrotaskHandler microtaskHandler;
 
@@ -41,5 +41,15 @@ public class EventLoopHandler implements IEventLoopHandler {
     @Override
     public <T> Promise<T> executePromise(IPromiseTask<T> task) {
         return microtaskHandler.createPromise(task.getExecutor());
+    }
+
+    @Override
+    public <T> Promise<T> resolvePromise(T value) {
+        return microtaskHandler.resolvePromise(value);
+    }
+
+    @Override
+    public <T> Promise<T> rejectPromise(Throwable error) {
+        return microtaskHandler.rejectPromise(error);
     }
 }
