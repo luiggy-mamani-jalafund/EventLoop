@@ -6,20 +6,25 @@ import presentation.EventLoop;
 public class ResolvedMicrotaskTest {
 
     public static void main(String[] args) {
-        EventLoop eventLoop = new EventLoop();
+        try (EventLoop eventLoop = new EventLoop()) {
+            eventLoop.execute(new ImmediateTask(() -> System.out.println("task 1")));
 
-        eventLoop.execute(new ImmediateTask(() -> System.out.println("task 1")));
+            eventLoop.resolve("Hello word")
+                    .then(value -> value + "!")
+                    .then(value -> {
+                        System.out.println(value);
+                        return value.length();
+                    })
+                    .finallyDo(() -> System.out.println("Finished promise"));
 
-        eventLoop.resolve("Hello word")
-                .then(value -> value + "!")
-                .then(value -> {
-                    System.out.println(value);
-                    return value.length();
-                })
-                .finallyDo(() -> System.out.println("Finished promise"));
-        
-        eventLoop.execute(new ImmediateTask(() -> System.out.println("task 2")));
-        eventLoop.run();
+            eventLoop.execute(new ImmediateTask(() -> System.out.println("task 2")));
+
+            Thread.sleep(500);
+
+            eventLoop.start();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
         
         /*
         * Expected:

@@ -28,7 +28,7 @@ public class FetchUserDataWithSetTimeoutTest {
 
         System.out.println("End of request");
 
-        eventLoop.run();
+        eventLoop.start();
 
         // Console output:
         // Start of request

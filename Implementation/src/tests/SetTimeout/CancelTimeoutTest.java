@@ -18,7 +18,7 @@ public class CancelTimeoutTest {
             System.out.println("Canceled timeout");
         }
 
-        eventLoop.run();
+        eventLoop.start();
 
         // Console output:
         // Scheduled timeout

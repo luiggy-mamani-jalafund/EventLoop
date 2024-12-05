@@ -2,6 +2,7 @@ package presentation;
 
 import application.useCases.queues.ICallstackHandler;
 import application.useCases.queues.IMicrotaskHandler;
+import application.useCases.queues.ITimerTaskHandler;
 import domain.entities.tasks.concrete.promises.Promise;
 import domain.entities.tasks.interfaces.IPromiseTask;
 import domain.entities.tasks.interfaces.ITask;
@@ -11,15 +12,18 @@ import infrastructure.useCases.queues.CallStackHandler;
 import infrastructure.useCases.queues.MicrotaskHandler;
 import infrastructure.useCases.queues.TimerTaskHandler;
 
-public class EventLoop {
+public class EventLoop implements AutoCloseable {
     private final EventLoopHandler eventLoopHandler;
 
     public EventLoop() {
-        CallStackHandler callstackHandler = new CallStackHandler();
-        MicrotaskHandler microtaskHandler = new MicrotaskHandler();
-        TimerTaskHandler timerTaskHandler = new TimerTaskHandler();
-
+        ICallstackHandler callstackHandler = new CallStackHandler();
+        IMicrotaskHandler microtaskHandler = new MicrotaskHandler();
+        ITimerTaskHandler timerTaskHandler = new TimerTaskHandler();
         this.eventLoopHandler = new EventLoopHandler(callstackHandler, microtaskHandler, timerTaskHandler);
+    }
+
+    public void start() {
+        runEventLoop();
     }
 
     public void execute(ITask<Runnable> task) {
@@ -46,11 +50,26 @@ public class EventLoop {
         return eventLoopHandler.rejectPromise(error);
     }
 
-    public void run() {
+    private void runEventLoop() {
         try {
             eventLoopHandler.run();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public void shutdown() {
+        eventLoopHandler.shutDown();
+    }
+
+    public boolean isRunning() {
+        return eventLoopHandler.isRunning();
+    }
+
+    @Override
+    public void close() {
+        shutdown();
     }
 }

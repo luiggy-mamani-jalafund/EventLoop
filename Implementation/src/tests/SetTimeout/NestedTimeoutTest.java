@@ -23,7 +23,7 @@ public class NestedTimeoutTest {
             }, 2000));
         }, 3000));
 
-        eventLoop.run();
+        eventLoop.start();
 
         // Console output:
         // Start

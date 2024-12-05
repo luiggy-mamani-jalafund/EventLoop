@@ -17,7 +17,7 @@ public class ComplexFunctionTest {
 
         eventLoop.execute(new ImmediateTask(() -> System.out.println("End of program")));
 
-        eventLoop.run();
+        eventLoop.start();
 
         // Console output:
         // Start of program

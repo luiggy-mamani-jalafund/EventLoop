@@ -33,7 +33,7 @@ public class MultipleSetTimeoutCallsTest {
 
         eventLoop.execute(new ImmediateTask(() -> System.out.println("End of the program")));
 
-        eventLoop.run();
+        eventLoop.start();
         
         // Console output:
         // Start of the program

@@ -10,7 +10,7 @@ public class TimerTaskSimpleTest {
         eventLoop.setTimeout(new TimerTask(() -> System.out.println("Task 1 executed after 1000ms"), 1000));
         eventLoop.setTimeout(new TimerTask(() -> System.out.println("Task 2 executed after 2000ms"), 2000));
 
-        eventLoop.run();
+        eventLoop.start();
 
         // Console output:
         // Task 1 executed after 1000ms
