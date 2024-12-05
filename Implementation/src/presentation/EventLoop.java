@@ -9,14 +9,17 @@ import infrastructure.useCases.EventLoopHandler;
 import infrastructure.useCases.queues.CallStackHandler;
 import infrastructure.useCases.queues.MicrotaskHandler;
 
-public class EventLoop {
+public class EventLoop implements AutoCloseable {
     private final EventLoopHandler eventLoopHandler;
 
     public EventLoop() {
         ICallstackHandler callstackHandler = new CallStackHandler();
         IMicrotaskHandler microtaskHandler = new MicrotaskHandler();
+        this.eventLoopHandler = new EventLoopHandler(callstackHandler, microtaskHandler);
+    }
 
-        eventLoopHandler = new EventLoopHandler(callstackHandler, microtaskHandler);
+    public void start() {
+        runEventLoop();
     }
 
     public void execute(ITask<Runnable> task) {
@@ -35,11 +38,26 @@ public class EventLoop {
         return eventLoopHandler.rejectPromise(error);
     }
 
-    public void run() {
+    private void runEventLoop() {
         try {
             eventLoopHandler.run();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public void shutdown() {
+        eventLoopHandler.shutDown();
+    }
+
+    public boolean isRunning() {
+        return eventLoopHandler.isRunning();
+    }
+
+    @Override
+    public void close() {
+        shutdown();
     }
 }

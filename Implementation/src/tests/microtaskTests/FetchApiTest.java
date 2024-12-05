@@ -9,21 +9,22 @@ import java.net.http.HttpResponse;
 public class FetchApiTest {
 
     public static void main(String[] args) {
-        EventLoop eventLoop = new EventLoop();
-        FetchApi fetchApi = new FetchApi(eventLoop);
+        try (EventLoop eventLoop = new EventLoop()) {
+            FetchApi fetchApi = new FetchApi(eventLoop);
 
-        eventLoop.execute(new ImmediateTask(() -> System.out.println("task 1")));
+            eventLoop.execute(new ImmediateTask(() -> System.out.println("task 1")));
 
-        fetchApi.fetch("https://jsonplaceholder.typicode.com/posts/1")
-                .then(HttpResponse::body)
-                .thenAccept(System.out::println)
-                .catchError(error -> {
-                    System.out.println(error.getMessage());
-                });
+            fetchApi.fetch("https://jsonplaceholder.typicode.com/posts/1")
+                    .then(HttpResponse::body)
+                    .thenAccept(System.out::println)
+                    .catchError(error -> {
+                        System.out.println(error.getMessage());
+                    });
 
-        eventLoop.execute(new ImmediateTask(() -> System.out.println("task 2")));
+            eventLoop.execute(new ImmediateTask(() -> System.out.println("task 2")));
 
-        eventLoop.run();
+            eventLoop.start();
+        }
 
         /*
         * Expected:
