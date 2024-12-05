@@ -11,7 +11,6 @@ import infrastructure.useCases.queues.MicrotaskHandler;
 
 public class EventLoop implements AutoCloseable {
     private final EventLoopHandler eventLoopHandler;
-    private final long executionTimeoutMs = 500;
 
     public EventLoop() {
         ICallstackHandler callstackHandler = new CallStackHandler();
