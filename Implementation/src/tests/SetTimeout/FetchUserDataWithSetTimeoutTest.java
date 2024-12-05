@@ -29,6 +29,12 @@ public class FetchUserDataWithSetTimeoutTest {
         System.out.println("End of request");
 
         eventLoop.run();
+
+        // Console output:
+        // Start of request
+        // End of request
+        // User obtained: { id: 1, name: 'Juan Pérez', email: 'juan@example.com' }
+        // User name: Juan Pérez
     }
 }
 

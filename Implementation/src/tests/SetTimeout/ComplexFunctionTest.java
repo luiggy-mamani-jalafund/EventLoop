@@ -18,6 +18,24 @@ public class ComplexFunctionTest {
         eventLoop.execute(new ImmediateTask(() -> System.out.println("End of program")));
 
         eventLoop.run();
+
+        // Console output:
+        // Start of program
+        // Running complexFunction with parameter1
+        // Synchronous iteration 0 with parameter1
+        // Synchronous iteration 1 with parameter1
+        // Synchronous iteration 2 with parameter1
+        // Running complexFunction with parameter2
+        // Synchronous iteration 0 with parameter2
+        // Synchronous iteration 1 with parameter2
+        // Synchronous iteration 2 with parameter2
+        // End of program
+        // Timeout 1 with parameter1
+        // Nested function with parameter1
+        // Timeout 1 with parameter2
+        // Nested function with parameter2
+        // Timeout inside nested function with parameter1
+        // Timeout inside nested function with parameter2
     }
 
     private static void executeComplexFunction(EventLoop eventLoop, String param) {
