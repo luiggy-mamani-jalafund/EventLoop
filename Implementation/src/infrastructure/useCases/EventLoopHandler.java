@@ -3,9 +3,11 @@ package infrastructure.useCases;
 import application.useCases.IEventLoopHandler;
 import application.useCases.queues.ICallstackHandler;
 import application.useCases.queues.IMicrotaskHandler;
+import application.useCases.queues.ITimerTaskHandler;
 import domain.entities.tasks.concrete.promises.Promise;
 import domain.entities.tasks.interfaces.IPromiseTask;
 import domain.entities.tasks.interfaces.ITask;
+import domain.entities.tasks.interfaces.ITimerTask;
 import infrastructure.utils.Sleeper;
 
 public class EventLoopHandler implements IEventLoopHandler {
@@ -13,11 +15,13 @@ public class EventLoopHandler implements IEventLoopHandler {
     private final ICallstackHandler callstackHandler;
     private volatile boolean isRunning;
     private final IMicrotaskHandler microtaskHandler;
+    private final ITimerTaskHandler timerTaskHandler;
 
-    public EventLoopHandler(ICallstackHandler callstackHandler, IMicrotaskHandler microtaskHandler) {
+    public EventLoopHandler(ICallstackHandler callstackHandler, IMicrotaskHandler microtaskHandler, ITimerTaskHandler timerTaskHandler) {
         this.callstackHandler = callstackHandler;
         this.microtaskHandler = microtaskHandler;
         this.isRunning = true;
+        this.timerTaskHandler = timerTaskHandler;
     }
 
     @Override
@@ -32,7 +36,11 @@ public class EventLoopHandler implements IEventLoopHandler {
                 microtask.run();
             }
 
-            if (!callstackHandler.hasTasks() && !microtaskHandler.hasTasks()) {
+            if (timerTaskHandler.hasTasks()) {
+                timerTaskHandler.runTasks();
+            }
+
+            if (!callstackHandler.hasTasks() && !microtaskHandler.hasTasks() && !timerTaskHandler.hasTasks()) {
                 Sleeper.tryToSleepOrDie(SLEEP_LOOP_MILLISECONDS);
             }
 
@@ -88,5 +96,25 @@ public class EventLoopHandler implements IEventLoopHandler {
             throw new IllegalStateException("Event loop is shutdown");
         }
         return microtaskHandler.rejectPromise(error);
+    }
+
+    public void setTimeout(ITimerTask timerTask) {
+        if (!isRunning) {
+            throw new IllegalStateException("Event loop is shutdown");
+        }
+        if (timerTask == null) {
+            throw new IllegalArgumentException("Task cannot be null");
+        }
+        timerTaskHandler.addTask(timerTask);
+    }
+
+    public boolean clearTimeout(String timerTaskId) {
+        if (!isRunning) {
+            throw new IllegalStateException("Event loop is shutdown");
+        }
+        if (timerTaskId == null) {
+            throw new IllegalArgumentException("Task cannot be null");
+        }
+        return timerTaskHandler.cancelTask(timerTaskId);
     }
 }

@@ -2,12 +2,15 @@ package presentation;
 
 import application.useCases.queues.ICallstackHandler;
 import application.useCases.queues.IMicrotaskHandler;
+import application.useCases.queues.ITimerTaskHandler;
 import domain.entities.tasks.concrete.promises.Promise;
 import domain.entities.tasks.interfaces.IPromiseTask;
 import domain.entities.tasks.interfaces.ITask;
+import domain.entities.tasks.interfaces.ITimerTask;
 import infrastructure.useCases.EventLoopHandler;
 import infrastructure.useCases.queues.CallStackHandler;
 import infrastructure.useCases.queues.MicrotaskHandler;
+import infrastructure.useCases.queues.TimerTaskHandler;
 
 public class EventLoop implements AutoCloseable {
     private final EventLoopHandler eventLoopHandler;
@@ -15,7 +18,8 @@ public class EventLoop implements AutoCloseable {
     public EventLoop() {
         ICallstackHandler callstackHandler = new CallStackHandler();
         IMicrotaskHandler microtaskHandler = new MicrotaskHandler();
-        this.eventLoopHandler = new EventLoopHandler(callstackHandler, microtaskHandler);
+        ITimerTaskHandler timerTaskHandler = new TimerTaskHandler();
+        this.eventLoopHandler = new EventLoopHandler(callstackHandler, microtaskHandler, timerTaskHandler);
     }
 
     public void start() {
@@ -28,6 +32,14 @@ public class EventLoop implements AutoCloseable {
 
     public <T> Promise<T> execute(IPromiseTask<T> task) {
         return eventLoopHandler.executePromise(task);
+    }
+
+    public void setTimeout(ITimerTask timerTask) {
+        eventLoopHandler.setTimeout(timerTask);
+    }
+
+    public boolean cancelTimeout(String timerTaskId) {
+        return eventLoopHandler.clearTimeout(timerTaskId);
     }
 
     public <T> Promise<T> resolve(T value) {
