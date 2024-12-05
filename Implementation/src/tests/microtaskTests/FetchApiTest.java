@@ -11,7 +11,6 @@ public class FetchApiTest {
     public static void main(String[] args) {
         try (EventLoop eventLoop = new EventLoop()) {
             FetchApi fetchApi = new FetchApi(eventLoop);
-            eventLoop.start();
 
             eventLoop.execute(new ImmediateTask(() -> System.out.println("task 1")));
 
@@ -24,11 +23,7 @@ public class FetchApiTest {
 
             eventLoop.execute(new ImmediateTask(() -> System.out.println("task 2")));
 
-            Thread.sleep(2000);
-
-            eventLoop.shutdown();
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
+            eventLoop.start();
         }
 
         /*

@@ -6,7 +6,6 @@ import presentation.EventLoop;
 public class RejectedMicrotaskTest {
     public static void main(String[] args) {
         try (EventLoop eventLoop = new EventLoop()) {
-            eventLoop.start();
 
             eventLoop.execute(new ImmediateTask(() -> System.out.println("task 1")));
 
@@ -16,18 +15,16 @@ public class RejectedMicrotaskTest {
 
             eventLoop.execute(new ImmediateTask(() -> System.out.println("task 2")));
 
-            Thread.sleep(500);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
+            eventLoop.start();
         }
 
         /*
          * Expected:
          *
          * task 1
+         * task 2
          * promise rejected exception
          * Finished promise
-         * task 2
          * */
     }
 }

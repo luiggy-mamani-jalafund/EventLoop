@@ -6,8 +6,6 @@ import presentation.EventLoop;
 public class CallStackTest {
     public static void main(String[] args) {
         try (EventLoop eventLoop = new EventLoop()) {
-            eventLoop.start();
-
             eventLoop.execute(new ImmediateTask(() -> System.out.println("task 1")));
 
             Runnable func = () -> System.out.println("task 3");
@@ -19,11 +17,7 @@ public class CallStackTest {
             eventLoop.execute(new ImmediateTask(() -> System.out.println("task 4")));
             eventLoop.execute(new ImmediateTask(func2));
 
-            Thread.sleep(100);
-
-            eventLoop.shutdown();
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
+            eventLoop.start();
         }
 
         /* Expected

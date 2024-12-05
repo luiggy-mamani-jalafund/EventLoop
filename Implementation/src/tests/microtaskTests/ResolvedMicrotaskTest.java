@@ -7,8 +7,6 @@ public class ResolvedMicrotaskTest {
 
     public static void main(String[] args) {
         try (EventLoop eventLoop = new EventLoop()) {
-            eventLoop.start();
-
             eventLoop.execute(new ImmediateTask(() -> System.out.println("task 1")));
 
             eventLoop.resolve("Hello word")
@@ -22,6 +20,8 @@ public class ResolvedMicrotaskTest {
             eventLoop.execute(new ImmediateTask(() -> System.out.println("task 2")));
 
             Thread.sleep(500);
+
+            eventLoop.start();
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }

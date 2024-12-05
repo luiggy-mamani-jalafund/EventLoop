@@ -6,7 +6,6 @@ import presentation.EventLoop;
 public class EventQueueTest {
     public static void main(String[] args) {
         try (EventLoop eventLoop = new EventLoop()) {
-            eventLoop.start();
 
             eventLoop.execute(new ImmediateTask(() -> System.out.println("Task 1")));
             eventLoop.execute(new ImmediateTask(() -> System.out.println("Task 2")));
@@ -20,7 +19,7 @@ public class EventQueueTest {
 
             Thread.sleep(100);
 
-            eventLoop.shutdown();
+            eventLoop.start();
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }

@@ -6,7 +6,6 @@ import presentation.EventLoop;
 public class EventLoopContinuousTest {
     public static void main(String[] args) {
         try (EventLoop eventLoop = new EventLoop()) {
-            eventLoop.start();
             System.out.println("Event Loop started, waiting for tasks...");
 
             eventLoop.execute(new ImmediateTask(() ->
@@ -40,6 +39,7 @@ public class EventLoopContinuousTest {
 
             Thread.sleep(1000);
 
+            eventLoop.start();
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }

@@ -8,8 +8,6 @@ import presentation.EventLoop;
 public class PromiseMicrotaskTest {
     public static void main(String[] args) {
         try (EventLoop eventLoop = new EventLoop()) {
-            eventLoop.start();
-
             eventLoop.execute(new ImmediateTask(() -> System.out.println("task 1")));
             eventLoop.execute(new PromiseTask<>(() -> {
                         Sleeper.tryToSleepOrDie(100);
@@ -28,6 +26,7 @@ public class PromiseMicrotaskTest {
             }));
 
             Thread.sleep(1000);
+            eventLoop.start();
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
