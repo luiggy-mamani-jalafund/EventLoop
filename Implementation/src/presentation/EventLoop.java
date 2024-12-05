@@ -11,20 +11,16 @@ import infrastructure.useCases.queues.MicrotaskHandler;
 
 public class EventLoop implements AutoCloseable {
     private final EventLoopHandler eventLoopHandler;
-    private final Thread eventLoopThread;
+    private final long executionTimeoutMs = 500;
 
     public EventLoop() {
         ICallstackHandler callstackHandler = new CallStackHandler();
         IMicrotaskHandler microtaskHandler = new MicrotaskHandler();
         this.eventLoopHandler = new EventLoopHandler(callstackHandler, microtaskHandler);
-        this.eventLoopThread = new Thread(this::runEventLoop, "EventLoop-Thread");
     }
 
     public void start() {
-        if (!isRunning()) {
-            throw new IllegalStateException("Cannot start a shutdown event loop");
-        }
-        eventLoopThread.start();
+        runEventLoop();
     }
 
     public void execute(ITask<Runnable> task) {
@@ -43,7 +39,7 @@ public class EventLoop implements AutoCloseable {
         return eventLoopHandler.rejectPromise(error);
     }
 
-    public void runEventLoop() {
+    private void runEventLoop() {
         try {
             eventLoopHandler.run();
         } catch (InterruptedException e) {
@@ -55,7 +51,6 @@ public class EventLoop implements AutoCloseable {
 
     public void shutdown() {
         eventLoopHandler.shutDown();
-        eventLoopThread.interrupt();
     }
 
     public boolean isRunning() {
