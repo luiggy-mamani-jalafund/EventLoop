@@ -20,12 +20,13 @@ public class DefaultErrorHandler implements IErrorHandler {
 
     @Override
     public void handleError(Runnable task, Throwable error) {
-        LOGGER.log(Level.SEVERE, "Error executing task: " + task, error);
+        String errorMessage = String.format("Task %s failed with error: %s", task, error.getMessage());
+        LOGGER.log(Level.SEVERE, errorMessage);
 
         try {
             notificationStrategy.notify(task, error);
         } catch (Exception notificationError) {
-            LOGGER.log(Level.WARNING, "Error in error notification", notificationError);
+            LOGGER.log(Level.WARNING, "Error in error notification: " + notificationError.getMessage());
         }
     }
 }
