@@ -1,5 +1,6 @@
 package infrastructure.useCases.queues;
 
+import application.useCases.exceptions.IErrorHandler;
 import application.useCases.queues.IMicrotaskHandler;
 import domain.entities.tasks.concrete.promises.Promise;
 
@@ -14,10 +15,12 @@ public class MicrotaskHandler implements IMicrotaskHandler {
 
     private final Queue<Runnable> microtaskQueue;
     private final ExecutorService executor;
+    private final IErrorHandler errorHandler;
 
-    public MicrotaskHandler() {
+    public MicrotaskHandler(IErrorHandler errorHandler) {
         this.microtaskQueue = new ArrayDeque<>();
         this.executor = Executors.newCachedThreadPool();
+        this.errorHandler = errorHandler;
     }
 
     @Override
@@ -54,7 +57,16 @@ public class MicrotaskHandler implements IMicrotaskHandler {
 
     @Override
     public Runnable getMicrotask() {
-        return microtaskQueue.poll();
+        return () -> {
+            Runnable task = microtaskQueue.poll();
+            if (task != null) {
+                try {
+                    task.run();
+                } catch (Throwable e) {
+                    errorHandler.handleError(task, e);
+                }
+            }
+        };
     }
 
     @Override
