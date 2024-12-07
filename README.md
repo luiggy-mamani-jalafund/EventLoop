@@ -1,4 +1,4 @@
-# EventLoop
+# Event Loop
 
 | Members                     |
 | :-------------------------- |
@@ -35,3 +35,11 @@ Process logs...
 Process logs...
 12/07/24 09:43:47 | INTEGRATION COMPLETED SUCCESSFULLY
 ```
+
+# Examples
+
+## Fibonacci
+In this example we will use the event loop to handle the creation of the UI and the change of the incrementing and decrementing number input `as Immediate tasks that will go to the Call Stack`, and the Fibonacci calculation will be `handled as a promise` as an input and output operation, where the number will be the input and the `result will be the output that will be handled with callbacks` to display it in the UI.
+
+**As seen in the example, the increment operations (Call Stack Tasks) are not interrupted while the Fibonacci calculation is being done (Promise that will be sent to the MicroTask Queue).**
+![fibonacci_image](./Client/src/main/resources/fibonacci_event_loop.gif)
