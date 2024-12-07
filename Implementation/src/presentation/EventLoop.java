@@ -1,5 +1,6 @@
 package presentation;
 
+import application.useCases.exceptions.IErrorHandler;
 import application.useCases.queues.ICallstackHandler;
 import application.useCases.queues.IMicrotaskHandler;
 import application.useCases.queues.ITimerTaskHandler;
@@ -7,6 +8,7 @@ import domain.entities.tasks.concrete.promises.Promise;
 import domain.entities.tasks.interfaces.IPromiseTask;
 import domain.entities.tasks.interfaces.ITask;
 import domain.entities.tasks.interfaces.ITimerTask;
+import domain.exceptions.DefaultErrorHandler;
 import infrastructure.useCases.EventLoopHandler;
 import infrastructure.useCases.queues.CallStackHandler;
 import infrastructure.useCases.queues.MicrotaskHandler;
@@ -16,10 +18,11 @@ public class EventLoop implements AutoCloseable {
     private final EventLoopHandler eventLoopHandler;
 
     public EventLoop() {
-        ICallstackHandler callstackHandler = new CallStackHandler();
-        IMicrotaskHandler microtaskHandler = new MicrotaskHandler();
-        ITimerTaskHandler timerTaskHandler = new TimerTaskHandler();
-        this.eventLoopHandler = new EventLoopHandler(callstackHandler, microtaskHandler, timerTaskHandler);
+        IErrorHandler errorHandler = new DefaultErrorHandler();
+        ICallstackHandler callstackHandler = new CallStackHandler(errorHandler);
+        IMicrotaskHandler microtaskHandler = new MicrotaskHandler(errorHandler);
+        ITimerTaskHandler timerTaskHandler = new TimerTaskHandler(errorHandler);
+        this.eventLoopHandler = new EventLoopHandler(callstackHandler, microtaskHandler, timerTaskHandler, errorHandler);
     }
 
     public void start() {
