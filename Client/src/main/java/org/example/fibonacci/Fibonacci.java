@@ -11,6 +11,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.SwingConstants;
+import java.awt.Color;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GridLayout;
@@ -30,8 +31,10 @@ public class Fibonacci {
     }
 
     public void renderUI() {
-        JFrame frame = new JFrame("Fibonacci Calculator");
-        Font font = new Font("Arial", Font.BOLD, 20);
+        JFrame frame = new JFrame("Event Loop Fibonacci");
+        Font font = new Font(Font.MONOSPACED, Font.PLAIN, 18);
+        Color fontColor = Color.decode("#fafafa");
+
         JButton incrementButton = new JButton("Increase");
         JButton decrementButton = new JButton("Decrease");
         JPanel buttonPanel = new JPanel(new FlowLayout());
@@ -41,26 +44,35 @@ public class Fibonacci {
         eventLoop.execute(new ImmediateTask(() -> frame.setLayout(new GridLayout(5, 1))));
 
         eventLoop.execute(new ImmediateTask(() -> numberLabel = new JLabel("Number: " + number, SwingConstants.CENTER)));
-        eventLoop.execute(new ImmediateTask(() -> numberLabel.setFont(font)));
+        eventLoop.execute(new ImmediateTask(() -> numberLabel.setFont(new Font(Font.MONOSPACED, Font.BOLD, 24))));
+        eventLoop.execute(new ImmediateTask(() -> numberLabel.setForeground(Color.decode("#000"))));
 
         eventLoop.execute(new ImmediateTask(() -> incrementButton.setFont(font)));
+        eventLoop.execute(new ImmediateTask(() -> incrementButton.setForeground(fontColor)));
+        eventLoop.execute(new ImmediateTask(() -> incrementButton.setBackground(Color.decode("#4756F5"))));
         eventLoop.execute(new ImmediateTask(() -> decrementButton.setFont(font)));
+        eventLoop.execute(new ImmediateTask(() -> decrementButton.setForeground(fontColor)));
+        eventLoop.execute(new ImmediateTask(() -> decrementButton.setBackground(Color.decode("#F52658"))));
         eventLoop.execute(new ImmediateTask(() -> incrementButton.addActionListener(e -> changeNumber(1))));
         eventLoop.execute(new ImmediateTask(() -> decrementButton.addActionListener(e -> changeNumber(-1))));
 
         eventLoop.execute(new ImmediateTask(() -> buttonPanel.add(decrementButton)));
         eventLoop.execute(new ImmediateTask(() -> buttonPanel.add(incrementButton)));
 
-        eventLoop.execute(new ImmediateTask(() -> goButton = new JButton("Go")));
+        eventLoop.execute(new ImmediateTask(() -> goButton = new JButton("Calculate Fibonacci")));
         eventLoop.execute(new ImmediateTask(() -> goButton.setFont(font)));
+        eventLoop.execute(new ImmediateTask(() -> goButton.setBackground(Color.decode("#51F5A0"))));
         eventLoop.execute(new ImmediateTask(() -> goButton.addActionListener(e -> startCalculation())));
 
         eventLoop.execute(new ImmediateTask(() -> progressBar = new JProgressBar(0, 100)));
         eventLoop.execute(new ImmediateTask(() -> progressBar.setFont(font)));
+        eventLoop.execute(new ImmediateTask(() -> progressBar.setBackground(Color.decode("#333"))));
+        eventLoop.execute(new ImmediateTask(() -> progressBar.setForeground(Color.decode("#3158F5"))));
         eventLoop.execute(new ImmediateTask(() -> progressBar.setStringPainted(true)));
 
         eventLoop.execute(new ImmediateTask(() -> resultLabel = new JLabel("Result: ", SwingConstants.CENTER)));
         eventLoop.execute(new ImmediateTask(() -> resultLabel.setFont(font)));
+        eventLoop.execute(new ImmediateTask(() -> resultLabel.setForeground(Color.decode("#3158F5"))));
 
         eventLoop.execute(new ImmediateTask(() -> frame.add(numberLabel)));
         eventLoop.execute(new ImmediateTask(() -> frame.add(buttonPanel)));
@@ -69,6 +81,7 @@ public class Fibonacci {
         eventLoop.execute(new ImmediateTask(() -> frame.add(resultLabel)));
 
         eventLoop.execute(new ImmediateTask(() -> frame.setVisible(true)));
+        eventLoop.execute(new ImmediateTask(() -> frame.setBackground(Color.BLACK)));
     }
 
     private void changeNumber(int delta) {
