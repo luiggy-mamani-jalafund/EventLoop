@@ -2,17 +2,22 @@ package presentation;
 
 import application.useCases.exceptions.IErrorHandler;
 import application.useCases.queues.ICallstackHandler;
+import application.useCases.queues.IIntervalTaskHandler;
 import application.useCases.queues.IMicrotaskHandler;
 import application.useCases.queues.ITimerTaskHandler;
 import domain.entities.tasks.concrete.promises.Promise;
+import domain.entities.tasks.interfaces.IIntervalTask;
 import domain.entities.tasks.interfaces.IPromiseTask;
 import domain.entities.tasks.interfaces.ITask;
 import domain.entities.tasks.interfaces.ITimerTask;
 import domain.exceptions.DefaultErrorHandler;
 import infrastructure.useCases.EventLoopHandler;
 import infrastructure.useCases.queues.CallStackHandler;
+import infrastructure.useCases.queues.IntervalTaskHandler;
 import infrastructure.useCases.queues.MicrotaskHandler;
 import infrastructure.useCases.queues.TimerTaskHandler;
+
+import java.util.UUID;
 
 public class EventLoop implements AutoCloseable {
     private final EventLoopHandler eventLoopHandler;
@@ -22,7 +27,8 @@ public class EventLoop implements AutoCloseable {
         ICallstackHandler callstackHandler = new CallStackHandler(errorHandler);
         IMicrotaskHandler microtaskHandler = new MicrotaskHandler(errorHandler);
         ITimerTaskHandler timerTaskHandler = new TimerTaskHandler(errorHandler);
-        this.eventLoopHandler = new EventLoopHandler(callstackHandler, microtaskHandler, timerTaskHandler, errorHandler);
+        IIntervalTaskHandler intervalTaskHandler = new IntervalTaskHandler(errorHandler);
+        this.eventLoopHandler = new EventLoopHandler(callstackHandler, microtaskHandler, timerTaskHandler, errorHandler, intervalTaskHandler);
     }
 
     public void start() {
@@ -51,6 +57,14 @@ public class EventLoop implements AutoCloseable {
 
     public <T> Promise<T> reject(Throwable error) {
         return eventLoopHandler.rejectPromise(error);
+    }
+
+    public UUID setInterval(IIntervalTask intervalTask) {
+        return eventLoopHandler.setInterval(intervalTask);
+    }
+
+    public boolean clearInterval(UUID intervalId) {
+        return eventLoopHandler.clearInterval(intervalId);
     }
 
     private void runEventLoop() {
