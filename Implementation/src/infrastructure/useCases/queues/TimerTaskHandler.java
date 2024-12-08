@@ -1,5 +1,6 @@
 package infrastructure.useCases.queues;
 
+import application.useCases.exceptions.IErrorHandler;
 import application.useCases.queues.ITimerTaskHandler;
 import domain.entities.tasks.concrete.timers.TimerTask;
 import domain.entities.tasks.interfaces.ITimerTask;
@@ -10,9 +11,11 @@ import java.util.Queue;
 
 public class TimerTaskHandler implements ITimerTaskHandler {
     private final Queue<ITimerTask> timerQueue;
+    private final IErrorHandler errorHandler;
 
-    public TimerTaskHandler() {
+    public TimerTaskHandler(IErrorHandler errorHandler) {
         this.timerQueue = new ArrayDeque<>();
+        this.errorHandler = errorHandler;
     }
 
     @Override
@@ -31,7 +34,11 @@ public class TimerTaskHandler implements ITimerTaskHandler {
 
         timerQueue.removeIf(timerTask -> {
             if (timerTask.getScheduledTime() <= currentTime) {
-                timerTask.getExecutor().run();
+                try {
+                    timerTask.getExecutor().run();
+                } catch (Throwable e) {
+                    errorHandler.handleError(timerTask.getExecutor(), e);
+                }
                 return true;
             }
             return false;

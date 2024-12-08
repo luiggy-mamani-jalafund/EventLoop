@@ -1,6 +1,7 @@
 package infrastructure.useCases;
 
 import application.useCases.IEventLoopHandler;
+import application.useCases.exceptions.IErrorHandler;
 import application.useCases.queues.ICallstackHandler;
 import application.useCases.queues.IMicrotaskHandler;
 import application.useCases.queues.ITimerTaskHandler;
@@ -16,36 +17,42 @@ public class EventLoopHandler implements IEventLoopHandler {
     private volatile boolean isRunning;
     private final IMicrotaskHandler microtaskHandler;
     private final ITimerTaskHandler timerTaskHandler;
+    private final IErrorHandler errorHandler;
 
-    public EventLoopHandler(ICallstackHandler callstackHandler, IMicrotaskHandler microtaskHandler, ITimerTaskHandler timerTaskHandler) {
+    public EventLoopHandler(ICallstackHandler callstackHandler, IMicrotaskHandler microtaskHandler,
+                            ITimerTaskHandler timerTaskHandler, IErrorHandler errorHandler) {
         this.callstackHandler = callstackHandler;
         this.microtaskHandler = microtaskHandler;
         this.isRunning = true;
         this.timerTaskHandler = timerTaskHandler;
+        this.errorHandler = errorHandler;
     }
 
     @Override
     public void run() throws InterruptedException {
         while (isRunning) {
-            if (callstackHandler.hasTasks()) {
-                callstackHandler.runTasks();
-            }
+            try {
+                if (callstackHandler.hasTasks()) {
+                    callstackHandler.runTasks();
+                }
 
-            while (microtaskHandler.hasTasks()) {
-                Runnable microtask = microtaskHandler.getMicrotask();
-                microtask.run();
-            }
+                while (microtaskHandler.hasTasks()) {
+                    Runnable microtask = microtaskHandler.getMicrotask();
+                    if (microtask != null) {
+                        microtask.run();
+                    }
+                }
 
-            if (timerTaskHandler.hasTasks()) {
-                timerTaskHandler.runTasks();
-            }
+                if (timerTaskHandler.hasTasks()) {
+                    timerTaskHandler.runTasks();
+                }
 
-            if (!callstackHandler.hasTasks() && !microtaskHandler.hasTasks() && !timerTaskHandler.hasTasks()) {
-                Sleeper.tryToSleepOrDie(SLEEP_LOOP_MILLISECONDS);
-            }
+                if (!callstackHandler.hasTasks() && !microtaskHandler.hasTasks() && !timerTaskHandler.hasTasks()) {
+                    Sleeper.tryToSleepOrDie(SLEEP_LOOP_MILLISECONDS);
+                }
 
-            if (Thread.interrupted()) {
-                throw new InterruptedException("Event loop was interrupted");
+            } catch (Throwable e) {
+                errorHandler.handleError(null, e);
             }
         }
     }

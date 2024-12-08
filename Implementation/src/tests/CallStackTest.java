@@ -15,7 +15,7 @@ public class CallStackTest {
             };
 
             eventLoop.execute(new ImmediateTask(() -> System.out.println("task 4")));
-            eventLoop.execute(new ImmediateTask(func2));
+            func2.run();
 
             eventLoop.start();
         }
