@@ -22,6 +22,6 @@ cp "$EVENT_LOOP_DIR/$JAR_NAME" "$LIBS_DIR/"
 
 echo $(date +"%D %T") "| BUILDING CLIENT WITH GRADLE..."
 cd "$CLIENT_DIR"
-gradle clean build
+./gradlew clean build
 
 echo $(date +"%D %T") "| INTEGRATION COMPLETED SUCCESSFULLY"
