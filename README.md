@@ -7,6 +7,11 @@
 | Salet Yasmin Gutierrez Nava |
 
 ---
+# Software Development Management
+We used Trello tool to track our progress development for this project, here is the link where you can see our dashboard Trello:
+
+- [EVENT LOOP TEAM - TRELLO DASHBOARD](https://trello.com/invite/b/674286a3f2d9e8a37c2c1434/ATTIb38abf5b46babfbb9a6b00ed147d7769F1F8F1EB/programacion-asincrona)
+
 
 # Event Loop Integration Script Documentation
 
@@ -43,6 +48,14 @@ In this example we will use the event loop to handle the creation of the UI and 
 
 **As seen in the example, the increment operations (Call Stack Tasks) are not interrupted while the Fibonacci calculation is being done (Promise that will be sent to the MicroTask Queue).**
 ![fibonacci_image](./Client/src/main/resources/fibonacci_event_loop.gif)
+
+## Circle Pop Game
+In this example, we use the event loop to manage both UI rendering and game logic. The appearance of balloons is handled as `recurring interval tasks` managed by the Timer Queue, while interactions like popping balloons and updating the score are `immediate tasks` sent to the Call Stack.
+
+As balloons are clicked, `the event loop ensures immediate UI updates` (removal of balloons and score increment). Additionally, dynamic speed adjustments for balloon spawning are achieved by modifying the interval timing directly, showcasing `the flexibility of interval-based scheduling.`
+
+**As seen in the example, the Call Stack processes immediate tasks (like balloon pops) without blocking the spawning of new balloons (Timer Queue), maintaining a smooth gameplay experience.**
+![circle_pop_game_image](./Client/src/main/resources/circle_pop_game.gif)
 
 ## Fast Reaction Game
 In this example, we use the EventLoop to handle both the creation of the user interface (UI) and time-related operations and user interactions. This game simulates a timer with a random delay and measures the user's reaction time by clicking a button when it changes color.
