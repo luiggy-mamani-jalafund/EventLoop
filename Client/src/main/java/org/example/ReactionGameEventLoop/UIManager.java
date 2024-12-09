@@ -1,4 +1,4 @@
-package org.example.fibonacci.ReactionGameEventLoop;
+package org.example.ReactionGameEventLoop;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;

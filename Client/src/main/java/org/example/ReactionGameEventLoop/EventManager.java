@@ -1,4 +1,4 @@
-package org.example.fibonacci.ReactionGameEventLoop;
+package org.example.ReactionGameEventLoop;
 
 import domain.entities.tasks.concrete.immediates.ImmediateTask;
 import domain.entities.tasks.concrete.timers.TimerTask;

@@ -1,4 +1,4 @@
-package org.example.fibonacci.ReactionGameEventLoop;
+package org.example.ReactionGameEventLoop;
 
 public class GameLogic {
     private long bestTime = Long.MAX_VALUE;
