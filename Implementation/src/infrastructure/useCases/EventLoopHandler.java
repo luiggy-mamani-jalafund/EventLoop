@@ -3,29 +3,36 @@ package infrastructure.useCases;
 import application.useCases.IEventLoopHandler;
 import application.useCases.exceptions.IErrorHandler;
 import application.useCases.queues.ICallstackHandler;
+import application.useCases.queues.IIntervalTaskHandler;
 import application.useCases.queues.IMicrotaskHandler;
 import application.useCases.queues.ITimerTaskHandler;
+import domain.entities.tasks.concrete.intervals.IntervalTask;
 import domain.entities.tasks.concrete.promises.Promise;
+import domain.entities.tasks.interfaces.IIntervalTask;
 import domain.entities.tasks.interfaces.IPromiseTask;
 import domain.entities.tasks.interfaces.ITask;
 import domain.entities.tasks.interfaces.ITimerTask;
 import infrastructure.utils.Sleeper;
 
+import java.util.UUID;
+
 public class EventLoopHandler implements IEventLoopHandler {
-    private static final long SLEEP_LOOP_MILLISECONDS = 1;
     private final ICallstackHandler callstackHandler;
     private volatile boolean isRunning;
     private final IMicrotaskHandler microtaskHandler;
     private final ITimerTaskHandler timerTaskHandler;
     private final IErrorHandler errorHandler;
+    private final IIntervalTaskHandler intervalTaskHandler;
 
     public EventLoopHandler(ICallstackHandler callstackHandler, IMicrotaskHandler microtaskHandler,
-                            ITimerTaskHandler timerTaskHandler, IErrorHandler errorHandler) {
+                            ITimerTaskHandler timerTaskHandler, IErrorHandler errorHandler,
+                            IIntervalTaskHandler intervalTaskHandler) {
         this.callstackHandler = callstackHandler;
         this.microtaskHandler = microtaskHandler;
         this.isRunning = true;
         this.timerTaskHandler = timerTaskHandler;
         this.errorHandler = errorHandler;
+        this.intervalTaskHandler = intervalTaskHandler;
     }
 
     @Override
@@ -47,8 +54,15 @@ public class EventLoopHandler implements IEventLoopHandler {
                     timerTaskHandler.runTasks();
                 }
 
-                if (!callstackHandler.hasTasks() && !microtaskHandler.hasTasks() && !timerTaskHandler.hasTasks()) {
-                    Sleeper.tryToSleepOrDie(SLEEP_LOOP_MILLISECONDS);
+                if (intervalTaskHandler.hasTasks()) {
+                    intervalTaskHandler.runTasks();
+                }
+
+                if (!callstackHandler.hasTasks() &&
+                        !microtaskHandler.hasTasks() &&
+                        !timerTaskHandler.hasTasks() &&
+                        !intervalTaskHandler.hasTasks()) {
+                    Sleeper.tryToSleepOrDie(1);
                 }
 
             } catch (Throwable e) {
@@ -123,5 +137,22 @@ public class EventLoopHandler implements IEventLoopHandler {
             throw new IllegalArgumentException("Task cannot be null");
         }
         return timerTaskHandler.cancelTask(timerTaskId);
+    }
+
+    public UUID setInterval(IIntervalTask intervalTask) {
+        if (!isRunning) {
+            throw new IllegalStateException("Event loop is shutdown");
+        }
+
+        intervalTaskHandler.addTask(intervalTask);
+        return intervalTask.getIntervalId();
+    }
+
+    public boolean clearInterval(UUID intervalId) {
+        if (!isRunning) {
+            throw new IllegalStateException("Event loop is shutdown");
+        }
+
+        return intervalTaskHandler.cancelInterval(intervalId);
     }
 }
