@@ -53,8 +53,8 @@ public class IntervalTaskTest {
          * Interval cancelled: true
          * Interval task executing... 1
          * Interval task executing... 2
-         * Interval task executing... 1
-         * Interval task executing... 2
+         * Interval task executing... 3
+         * Interval task executing... 4
          */
     }
 }
