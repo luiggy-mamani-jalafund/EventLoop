@@ -73,7 +73,7 @@ Here:
 When the user clicks the button, the event is handled as an immediate task. This ensures that the logic for calculating the reaction time is processed immediately and not interrupted by other operations.
 
 Example of a user click task:
-![setTimeout](./Client/src/main/resources/ImmediateTasks.png)
+![ImmediateTasks](./Client/src/main/resources/ImmediateTasks.png)
 
 **4. Automatic Game Restart (Timer Queue)**
 
