@@ -72,7 +72,7 @@ public class CirclePopGame {
     }
 
     private void spawnBalloon() {
-        if (balloonCount >= 15) {
+        if (balloonCount >= 20) {
             gameOver();
             return;
         }
@@ -102,7 +102,7 @@ public class CirclePopGame {
             gamePanel.add(balloon);
             gamePanel.repaint();
             balloonCount++;
-            if (balloonCount >= 15) {
+            if (balloonCount >= 20) {
                 gameOver();
             }
         }));
